@@ -1,0 +1,13 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1700956321086,
+      "tag": "0000_real_hercules",
+      "breakpoints": true
+    }
+  ]
+}
