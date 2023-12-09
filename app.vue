@@ -1,16 +1,25 @@
 <template>
   <div>
-    <div class="">{{ test }}</div>
+    <div class="flex items-center justify-center">
+      <UButton @click="submit" class="mt-10 flex items-center justify-center"
+        >Test button</UButton
+      >
+    </div>
+    <div>{{ outside }}</div>
+    <div v-if="!outside">outside doesnt exits</div>
   </div>
 </template>
 
-<script setup lang="ts">
-import db from "./drizzle/db";
-import { users } from "./drizzle/schema";
-import { eq, lt, gte, ne } from "drizzle-orm";
-const test = await db
-  .selectDistinct()
-  .from(users)
-  .limit(1)
-  .where(eq(users.userId, "1f6b5d42-5186-446c-8143-74ce3aec84b6"));
+<script setup>
+const email = ref("hungletatdac1234@gmail.com");
+const password = ref("99888");
+const outside = ref();
+
+async function submit() {
+  const res = await $fetch("/api/login", {
+    method: "post",
+    body: { email: email.value, password: password.value },
+  });
+  console.log(res);
+}
 </script>
