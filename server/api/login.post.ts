@@ -2,6 +2,7 @@ import db from "../../drizzle/db";
 import { sessions, users } from "../../drizzle/schema";
 import { eq, lt, gte, ne, sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";
+
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   const currentUser = await db
@@ -21,7 +22,7 @@ export default defineEventHandler(async (event) => {
       .from(sessions)
       .where(sql`${sessions.userId} = ${currentUser[0].userId}`);
     console.log(currentsession);
-    return currentsession;
+    return currentsession[0].sessionId;
   }
 
   return undefined;
