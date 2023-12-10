@@ -12,6 +12,7 @@
   "devDependencies": {
     "@nuxt/devtools": "latest",
     "@nuxtjs/tailwindcss": "^6.10.1",
+    "@types/bcryptjs": "^2.4.6",
     "autoprefixer": "^10.4.16",
     "drizzle-kit": "^0.20.6",
     "nuxt": "^3.8.2",
@@ -24,6 +25,7 @@
   },
   "dependencies": {
     "@nuxt/ui": "^2.11.0",
+    "bcryptjs": "^2.4.3",
     "drizzle-orm": "^0.29.0",
     "postgres": "^3.4.3",
     "zod": "^3.22.4"
