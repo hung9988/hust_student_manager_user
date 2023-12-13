@@ -26,10 +26,7 @@
       "compositePrimaryKeys": {
         "users_name_age": {
           "name": "users_pkey",
-          "columns": [
-            "name",
-            "age"
-          ]
+          "columns": ["name", "age"]
         }
       },
       "uniqueConstraints": {}
