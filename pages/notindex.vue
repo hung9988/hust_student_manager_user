@@ -14,10 +14,9 @@
 const email = ref("hungletatdac123456@gmail.com");
 const password = ref("080504");
 
-const outside = ref();
+const { data: outside } = await useFetch("/api/user");
 
 async function submit() {
-  console.log(password.value);
   const res = await $fetch("/api/signup", {
     method: "post",
     body: { email: email.value, password: password.value },

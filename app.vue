@@ -5,3 +5,4 @@
 
   <UNotifications />
 </template>
+<script setup></script>

@@ -21,8 +21,12 @@ export default defineEventHandler(async (event) => {
       .select()
       .from(sessions)
       .where(sql`${sessions.userId} = ${currentUser[0].userId}`);
-    console.log(currentsession);
-    return currentsession[0].sessionId;
+
+    setCookie(event, "current_session", currentsession[0].sessionId);
+    const user = await db.execute(
+      sql`select user_id,email,role from ${users} where ${users.userId} = (select ${sessions.userId} from ${sessions} where ${sessions.sessionId}=${currentsession[0].sessionId})`,
+    );
+    return user[0];
   }
 
   return undefined;

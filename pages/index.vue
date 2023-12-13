@@ -9,10 +9,17 @@
       <UButton @click="logout" class="mt-10 flex items-center justify-center"
         >Log out</UButton
       >
+      <div class="flex items-center justify-center">
+        <UButton @click="test" class="mt-10 flex items-center justify-center">{{
+          testing
+        }}</UButton>
+      </div>
     </div>
-    <div>{{ outside }}</div>
-    <div v-if="session">
-      LOGGED IN<UButton @click="getuser">{{ user }}dasdsd</UButton>
+    <div v-if="currentUser">
+      LOGGED IN<UButton class="flex items-center justify-center"
+        >get current user
+      </UButton>
+      <div v-if="currentUser">{{ currentUser }}</div>
     </div>
     <div v-else>NOT LOGGED IN</div>
   </div>
@@ -21,28 +28,30 @@
 <script setup lang="ts">
 const email = ref("hungletatdac123456@gmail.com");
 const password = ref("080504");
-const user = ref();
-const outside = ref();
+const currentUser = ref();
 
-const session = useCookie("Session");
+onMounted(() => {
+  currentUser.value = localStorage.getItem("authToke");
+});
 async function submit() {
-  const res = await $fetch("/api/login", {
+  const res = await useFetch("/api/login", {
     method: "post",
     body: { email: email.value, password: password.value },
   });
-  console.log(res[0]);
-  session.value = res;
+  currentUser.value = res.data.value;
+  if (process.client) {
+    localStorage.setItem("authToke", JSON.stringify(res.data.value));
+  }
 }
 async function logout() {
-  const res = await $fetch("/api/logout", {
-    method: "post",
-  });
-  session.value = null;
+  const res = await useFetch("/api/logout", { method: "post" });
+  const { data } = await useFetch("/api/user");
+  currentUser.value = undefined;
+  localStorage.removeItem("authToke");
 }
-async function getuser() {
-  const res = await $fetch("/api/user", {
-    method: "get",
-  });
-  user.value = res;
+const testing = ref();
+async function test() {
+  const { data } = await useFetch("/api/user");
+  testing.value = data.value;
 }
 </script>
