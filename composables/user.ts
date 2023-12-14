@@ -1,4 +1,3 @@
-export function useUser() {
-  const user = useState(() => ({}));
-  return user;
-}
+export const useUser = () => {
+  return useState("session", () => useCookie("current_session"));
+};

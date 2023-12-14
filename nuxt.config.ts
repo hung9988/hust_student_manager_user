@@ -2,5 +2,5 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
-  modules: ["@nuxt/ui"],
+  modules: ["@nuxt/ui", "@vueuse/nuxt"],
 });

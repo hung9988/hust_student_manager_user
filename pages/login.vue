@@ -57,6 +57,7 @@
 </template>
 <script setup lang="ts">
 import { z } from "zod";
+
 import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
 const schema = z.object({
   email: z.string().email("Invalid email"),
@@ -68,20 +69,21 @@ const state = ref({
   email: "",
   password: "",
 });
-const user = useUser();
+const session = useUser();
 async function submit(event: FormSubmitEvent<Schema>) {
   pending.value = true;
   const res = await useFetch("/api/login", {
     method: "post",
     body: { email: event.data.email, password: event.data.password },
   });
-  if (res.data.value) {
-    user.value = res.data.value;
+  const temp = useCookie("current_session");
+  if (temp.value) {
+    session.value = temp.value;
   }
   if (process.client) {
     localStorage.setItem("user", JSON.stringify(res.data.value));
   }
-  console.log(user.value);
+
   pending.value = false;
   return navigateTo("/");
 }

@@ -6,4 +6,5 @@ export default {
     connectionString:
       "postgresql://postgres:BMvsgy.s@5Kw3FQ@143.198.80.235:5432/postnuxtDO",
   },
+  out: "./drizzle",
 };
