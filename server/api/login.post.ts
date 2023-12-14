@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
 
     setCookie(event, "current_session", currentsession[0].sessionId);
     const user = await db.execute(
-      sql`select user_id,email,role from ${users} where ${users.userId} = (select ${sessions.userId} from ${sessions} where ${sessions.sessionId}=${currentsession[0].sessionId})`,
+      sql`select user_id,email,role from users where user_id = (select user_id from sessions where session_id=${currentsession[0].sessionId})`,
     );
     return user[0];
   }
