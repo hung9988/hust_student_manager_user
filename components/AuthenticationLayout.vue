@@ -4,7 +4,7 @@
       <div
         class="col-span-1 ml-5 flex items-center justify-start text-3xl font-semibold"
       >
-        HUST MANAGER
+        <UButton @click="test">test</UButton>
       </div>
       <div class="col-span-3"></div>
       <div class="col-span-2 mr-2 space-y-2">
@@ -42,16 +42,14 @@
 </template>
 
 <script setup lang="ts">
+async function test() {}
 import { ref, watch } from "vue";
 const user = useUser();
-
-console.log(user.value);
 async function logout() {
   await useFetch("/api/logout", { method: "post" });
   localStorage.removeItem("user");
 
   user.value = "";
-  console.log(user.value);
 }
 const items = [
   [
