@@ -42,7 +42,16 @@
 </template>
 
 <script setup lang="ts">
-async function test() {}
+async function test() {
+  const card = ref([
+    { first: "ly", last: "thanh", age: 20 },
+    { second: "ly", last: "tnh", age: 30 },
+  ]);
+  await useFetch("/api/addclasses", {
+    method: "post",
+    body: { card: card.value },
+  });
+}
 import { ref, watch } from "vue";
 const user = useUser();
 async function logout() {

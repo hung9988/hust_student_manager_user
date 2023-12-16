@@ -6,13 +6,11 @@ export default defineEventHandler(async (event) => {
 
   body.query = "%" + body.query + "%";
   console.log(body.query);
-  const subjects = await db.execute(
-    sql`select * from subjects where subject_id ILIKE ${
-      body.query
-    } OR subject_name ILIKE ${body.query} OFFSET ${
+  const classes = await db.execute(
+    sql`select * from classes where subject_id ILIKE ${body.query}  OFFSET ${
       (body.page - 1) * body.pageCount
     } LIMIT ${body.pageCount}`,
   );
 
-  return { subjects };
+  return { classes };
 });

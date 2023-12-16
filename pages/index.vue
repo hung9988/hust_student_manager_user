@@ -43,7 +43,7 @@ const { data } = await useFetch("/api/getsubjects", {
 
 const subjects = ref();
 subjects.value = data.value;
-console.log(subjects[0]);
+console.log(subjects.value);
 </script>
 <template>
   <div class="min-h-screen bg-background-900">
