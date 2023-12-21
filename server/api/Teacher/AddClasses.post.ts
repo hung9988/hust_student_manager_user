@@ -1,14 +1,15 @@
-import db from "../../drizzle/db";
-import "../../drizzle/schema";
+import db from "../../../drizzle/db";
+import "../../../drizzle/schema";
 import { eq, lt, gte, ne, sql } from "drizzle-orm";
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
-  const infor = body.data;
+  ///THIS IS FOR TESTING PURPOSE, DELETE WHEN DEPLOYING
   await db.execute(
     sql.raw(
       `delete from class_time_location;delete from classes_teachers;delete from classes;`,
     ),
   );
+  /////////////////// END OF TESTING CODE ///////////////////////
   let values_classes = "values";
   for (const element of body.data) {
     values_classes += `('${element.subject_id}',${element.capacity}),`;

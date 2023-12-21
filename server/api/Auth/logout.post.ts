@@ -1,5 +1,5 @@
-import db from "../../drizzle/db";
-import { sessions, users } from "../../drizzle/schema";
+import db from "../../../drizzle/db";
+import { sessions, users } from "../../../drizzle/schema";
 import { eq, lt, gte, ne, sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
