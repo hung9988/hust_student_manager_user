@@ -1,9 +1,13 @@
 import postgres from "postgres";
 import { drizzle } from "drizzle-orm/postgres-js";
+import "dotenv/config";
 
-const queryClient = postgres(
-  "postgresql://postgres:BMvsgy.s@5Kw3FQ@143.198.80.235:5432/postnuxtDO",
-);
+// Ensure DB_URL is defined and has a value
+if (!process.env.DB_URL) {
+  throw new Error("DB_URL environment variable is not defined");
+}
+
+const queryClient = postgres(process.env.DB_URL);
 const db = drizzle(queryClient);
 
 export default db;
