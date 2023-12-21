@@ -72,7 +72,7 @@ const state = ref({
 const session = useUser();
 async function submit(event: FormSubmitEvent<Schema>) {
   pending.value = true;
-  const res = await useFetch("/api/login", {
+  const res = await useFetch("/api/Auth/login", {
     method: "post",
     body: { email: event.data.email, password: event.data.password },
   });

@@ -4,14 +4,14 @@ import { eq, lt, gte, ne, sql } from "drizzle-orm";
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   ///THIS IS FOR TESTING PURPOSE, DELETE WHEN DEPLOYING
-  await db.execute(
-    sql.raw(
-      `delete from class_time_location;delete from classes_teachers;delete from classes;`,
-    ),
-  );
+  // await db.execute(
+  //   sql.raw(
+  //     `delete from class_time_location;delete from classes_teachers;delete from classes;`,
+  //   ),
+  // );
   /////////////////// END OF TESTING CODE ///////////////////////
   let values_classes = "values";
-  for (const element of body.data) {
+  for (const element of body.selected) {
     values_classes += `('${element.subject_id}',${element.capacity}),`;
   }
   values_classes = values_classes.slice(0, -1);
@@ -23,8 +23,8 @@ export default defineEventHandler(async (event) => {
 
   let values_teacher = "values";
   let values_time_location = "values";
-  for (let [index, element] of body.data.entries()) {
-    values_teacher += `(${res[index].class_id},'${element.user_id}'),`;
+  for (let [index, element] of body.selected.entries()) {
+    values_teacher += `(${res[index].class_id},'${body.user_id}'),`;
     values_time_location += `(${res[index].class_id},'${element.start_time}','${element.end_time}','${element.day_of_week}','${element.location}'),`;
   }
   values_teacher = values_teacher.slice(0, -1);
@@ -39,5 +39,5 @@ export default defineEventHandler(async (event) => {
     ),
   );
 
-  return { result: body.data };
+  return { result: body.selected };
 });

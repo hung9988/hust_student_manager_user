@@ -4,7 +4,7 @@
       <div
         class="col-span-1 ml-5 flex items-center justify-start text-3xl font-semibold"
       >
-        <UButton @click="test">test</UButton>
+        <div @click="test">HUST MANAGER</div>
       </div>
       <div class="col-span-3"></div>
       <div class="col-span-2 mr-2 space-y-2">
@@ -30,6 +30,7 @@
         <div v-if="user" class="col-span-1">
           <div class="md:flex md:justify-end">
             <ULink
+              to="/login"
               @click="logout"
               class="flex items-center justify-center rounded-md border bg-accent-500 p-1 md:w-1/3"
               >Logout</ULink
@@ -55,7 +56,7 @@ async function test() {
 import { ref, watch } from "vue";
 const user = useUser();
 async function logout() {
-  await useFetch("/api/logout", { method: "post" });
+  await useFetch("/api/Auth/logout", { method: "post" });
   localStorage.removeItem("user");
 
   user.value = "";
