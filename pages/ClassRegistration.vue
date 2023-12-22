@@ -35,15 +35,21 @@ const columns = [
     key: "location",
     label: "location",
   },
+  {
+    key: "enrolled",
+    label: "Capacity",
+  },
 ];
 
 const { data: classes, refresh: refreshget } = await useFetch(
-  "/api/GetClasses",
+  "/api/Student/GetClasses",
   {
     method: "post",
     body: { query: query.value, page: page.value, pageCount: pageCount.value },
   },
 );
+
+console.log(classes.value.classes);
 
 const selected = ref([]);
 function select(row) {
@@ -87,7 +93,7 @@ async function delete_classes() {
   <div class="min-h-screen bg-background-900">
     <div class="space-y-10 py-[10vh]">
       <div class="flex justify-center">
-        <div class="mb-10 text-4xl font-semibold">CLASS DELETION</div>
+        <div class="mb-10 text-4xl font-semibold">CLASS REGISTRATION</div>
       </div>
       <div class="">
         <div class="flex items-center justify-center">
@@ -122,7 +128,7 @@ async function delete_classes() {
             :ui="{ font: 'font-bold' }"
             class="mr-10 flex w-1/3 items-center justify-center"
             @click="delete_classes()"
-            >Delete</UButton
+            >Register</UButton
           >
         </div>
       </div>

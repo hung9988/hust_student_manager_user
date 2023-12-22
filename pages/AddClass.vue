@@ -231,7 +231,7 @@ async function send_classes() {
   <div class="min-h-screen bg-background-900">
     <div class="space-y-10 py-[10vh]">
       <div class="flex justify-center">
-        <div class="mb-10 text-4xl font-semibold">Class Creation</div>
+        <div class="mb-10 text-4xl font-semibold">CLASS CREATION</div>
       </div>
       <div class="">
         <div class="flex items-center justify-center">
@@ -263,6 +263,7 @@ async function send_classes() {
         </div>
         <div class="col-span-1 flex justify-end">
           <UButton
+            :ui="{ font: 'font-bold' }"
             class="mr-10 flex w-1/3 items-center justify-center"
             @click="isOpen = true"
             >Proceed</UButton
