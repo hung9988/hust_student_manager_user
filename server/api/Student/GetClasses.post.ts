@@ -46,13 +46,13 @@ export default defineEventHandler(async (event) => {
           class_final c
           join enrollment e on c.class_id = e.class_id
           GROUP BY c.class_id
-      ),
-      class_final_final as(
+      )
+      crete or replace view class_final_final as(
       select
         c.*,
         b.enrolled
       from
-        class_final c join class_capacity b on c.class_id=b.class_id
+        class_final c left outer join class_capacity b on c.class_id=b.class_id
         )
         select * from class_final_final
       where
@@ -66,8 +66,10 @@ export default defineEventHandler(async (event) => {
   );
   classes.forEach((element) => {
     element.last_name = element.last_name + " " + element.first_name;
-    element.enrolled = element.enrolled + "/" + element.capacity;
+    element.enrolled =
+      (element.enrolled ? element.enrolled : "0") + "/" + element.capacity;
   });
   // WORK IN PROGRESS
+  console.log(classes + "THIS IS HERE");
   return { classes };
 });

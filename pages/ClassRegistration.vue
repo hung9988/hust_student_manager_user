@@ -49,12 +49,10 @@ const { data: classes, refresh: refreshget } = await useFetch(
   },
 );
 
-console.log(classes.value.classes);
-
 const selected = ref([]);
 function select(row) {
   const index = selected.value.findIndex(
-    (item) => item.subject_id === row.subject_id,
+    (item) => item.class_id === row.class_id,
   );
   if (index === -1) {
     selected.value.push(row);
@@ -77,12 +75,13 @@ const filteredRows = computed(() => {
 });
 
 const user = useStorage("user", null);
-async function delete_classes() {
-  const { data } = await useFetch("/api/Teacher/DeleteClasses", {
+async function register_classes() {
+  const { data } = await useFetch("/api/Student/RegisterClasses", {
     method: "post",
     body: {
       user_id: JSON.parse(user.value).user_id,
       data: selected.value,
+      semester: "2023-2",
     },
   });
   selected.value = [];
@@ -127,7 +126,7 @@ async function delete_classes() {
           <UButton
             :ui="{ font: 'font-bold' }"
             class="mr-10 flex w-1/3 items-center justify-center"
-            @click="delete_classes()"
+            @click="register_classes"
             >Register</UButton
           >
         </div>

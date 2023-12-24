@@ -35,10 +35,14 @@ const columns = [
     key: "location",
     label: "location",
   },
+  {
+    key: "enrolled",
+    label: "Capacity",
+  },
 ];
 
 const { data: classes, refresh: refreshget } = await useFetch(
-  "/api/GetClasses",
+  "/api/Student/GetPersonalClasses",
   {
     method: "post",
     body: { query: query.value, page: page.value, pageCount: pageCount.value },
@@ -71,11 +75,11 @@ const filteredRows = computed(() => {
 });
 
 const user = useStorage("user", null);
-async function delete_classes() {
-  const { data } = await useFetch("/api/Teacher/DeleteClasses", {
+async function unregister_classes() {
+  const { data } = await useFetch("/api/Student/UnregisterClasses", {
     method: "post",
     body: {
-      user_id: JSON.parse(user.value).user_id,
+      student_id: JSON.parse(user.value).user_id,
       data: selected.value,
     },
   });
@@ -87,7 +91,7 @@ async function delete_classes() {
   <div class="min-h-screen bg-background-900">
     <div class="space-y-10 py-[10vh]">
       <div class="flex justify-center">
-        <div class="mb-10 text-4xl font-semibold">CLASS DELETION</div>
+        <div class="mb-10 text-4xl font-semibold">UNREGISTER CLASSES</div>
       </div>
       <div class="">
         <div class="flex items-center justify-center">
@@ -121,8 +125,8 @@ async function delete_classes() {
           <UButton
             :ui="{ font: 'font-bold' }"
             class="mr-10 flex w-1/3 items-center justify-center"
-            @click="delete_classes()"
-            >Delete</UButton
+            @click="unregister_classes"
+            >Unregister</UButton
           >
         </div>
       </div>
