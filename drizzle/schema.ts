@@ -1,4 +1,4 @@
-import { pgTable, foreignKey, serial, varchar, smallint, uuid, jsonb, unique, smallserial, text, numeric, integer, primaryKey, time } from "drizzle-orm/pg-core"
+import { pgTable, foreignKey, serial, varchar, smallint, boolean, integer, unique, uuid, numeric, time, bigint, text, smallserial, primaryKey } from "drizzle-orm/pg-core"
   import { sql } from "drizzle-orm"
 
 
@@ -7,6 +7,10 @@ export const classes = pgTable("classes", {
 	classId: serial("class_id").primaryKey().notNull(),
 	subjectId: varchar("subject_id").references(() => subjects.subjectId),
 	capacity: smallint("capacity"),
+	isOpen: boolean("is_open").default(true),
+	externalResources: varchar("external_resources"),
+	semester: varchar("semester"),
+	enrolled: integer("enrolled").default(0),
 });
 
 export const users = pgTable("users", {
@@ -17,22 +21,51 @@ export const users = pgTable("users", {
 	phone: varchar("phone"),
 	role: varchar("role"),
 	encryptedPassword: varchar("encrypted_password").notNull(),
-	metadata: jsonb("metadata"),
-});
-
-export const sessions = pgTable("sessions", {
-	sessionId: uuid("session_id").default(sql`uuid_generate_v4()`).primaryKey().notNull(),
-	userId: uuid("user_id").references(() => users.userId),
 },
 (table) => {
 	return {
-		sessionsUserIdKey: unique("sessions_user_id_key").on(table.userId),
+		uniqueUser: unique("unique_user").on(table.email),
 	}
 });
 
-export const schools = pgTable("schools", {
-	schoolId: smallserial("school_id").primaryKey().notNull(),
-	schoolName: varchar("school_name"),
+export const teacher = pgTable("teacher", {
+	teacherId: uuid("teacher_id").primaryKey().notNull().references(() => users.userId),
+	qualification: varchar("qualification"),
+	schoolId: integer("school_id"),
+});
+
+export const student = pgTable("student", {
+	studentId: uuid("student_id").primaryKey().notNull().references(() => users.userId),
+	enrolledYear: integer("enrolled_year"),
+	programId: integer("program_id"),
+	warningLevel: integer("warning_level").default(0),
+	totalCredit: numeric("total_credit").default('28'),
+});
+
+export const classesInfo = pgTable("classes_info", {
+	classId: integer("class_id"),
+	startTime: time("start_time"),
+	endTime: time("end_time"),
+	dayOfWeek: varchar("day_of_week"),
+	location: varchar("location"),
+	subjectId: varchar("subject_id"),
+	capacity: smallint("capacity"),
+	isOpen: boolean("is_open"),
+});
+
+export const classAll = pgTable("class_all", {
+	classId: integer("class_id"),
+	subjectId: varchar("subject_id"),
+	capacity: smallint("capacity"),
+	isOpen: boolean("is_open"),
+	firstName: varchar("first_name"),
+	lastName: varchar("last_name"),
+	startTime: time("start_time"),
+	endTime: time("end_time"),
+	dayOfWeek: varchar("day_of_week"),
+	location: varchar("location"),
+	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
+	enrolled: bigint("enrolled", { mode: "number" }),
 });
 
 export const subjects = pgTable("subjects", {
@@ -52,6 +85,11 @@ export const programs = pgTable("programs", {
 	programDescription: varchar("program_description"),
 });
 
+export const schools = pgTable("schools", {
+	schoolId: smallserial("school_id").primaryKey().notNull(),
+	schoolName: varchar("school_name"),
+});
+
 export const classesTeachers = pgTable("classes_teachers", {
 	classId: integer("class_id").notNull().references(() => classes.classId),
 	teacherId: uuid("teacher_id").notNull().references(() => users.userId),
@@ -59,6 +97,16 @@ export const classesTeachers = pgTable("classes_teachers", {
 (table) => {
 	return {
 		pk: primaryKey({ columns: [table.classId, table.teacherId], name: "pk"})
+	}
+});
+
+export const sessions = pgTable("sessions", {
+	sessionId: uuid("session_id").default(sql`uuid_generate_v4()`).notNull(),
+	userId: uuid("user_id").notNull().references(() => users.userId),
+},
+(table) => {
+	return {
+		sessionsPkey: primaryKey({ columns: [table.sessionId, table.userId], name: "sessions_pkey"})
 	}
 });
 
@@ -90,7 +138,7 @@ export const enrollment = pgTable("enrollment", {
 	studentId: uuid("student_id").notNull().references(() => users.userId),
 	midTerm: numeric("mid_term"),
 	endTerm: numeric("end_term"),
-	absence: integer("absence"),
+	absence: integer("absence").default(0),
 	semester: varchar("semester"),
 },
 (table) => {

@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
   const hashedpassword = bcrypt.hashSync(body.password, salt);
 
   const res = await db.execute(
-    sql`insert into users(first_name,last_name,role,email,encrypted_password,metadata) values(${body.first_name},${body.last_name},${body.role},${body.email},${hashedpassword},${body.metadata}) returning *`,
+    sql`insert into users(first_name,last_name,role,email,encrypted_password) values(${body.first_name},${body.last_name},${body.role},${body.email},${hashedpassword},${body.metadata}) returning *`,
   );
   return { res };
 });

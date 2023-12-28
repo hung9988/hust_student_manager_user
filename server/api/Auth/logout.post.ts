@@ -5,7 +5,8 @@ import bcrypt from "bcryptjs";
 
 export default defineEventHandler(async (event) => {
   const cookies = parseCookies(event);
-  const session = cookies.current_session;
-  await db.delete(sessions).where(sql`${sessions.sessionId}=${session}`);
-  deleteCookie(event, "current_session");
+  const session = cookies.session;
+  await db.execute(
+    sql.raw(`delete from sessions where session_id = '${session}'`),
+  );
 });

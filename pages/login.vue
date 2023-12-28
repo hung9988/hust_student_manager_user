@@ -57,8 +57,9 @@
 </template>
 <script setup lang="ts">
 import { z } from "zod";
-
+import { useStorage } from "@vueuse/core";
 import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
+import { routeLocationKey } from "vue-router";
 const schema = z.object({
   email: z.string().email("Invalid email"),
   password: z.string().min(4, "Must be at least 4 characters"),
@@ -69,22 +70,32 @@ const state = ref({
   email: "",
   password: "",
 });
-const session = useUser();
+
+const session = useCookie("session");
+const role = useCookie("role");
+
 async function submit(event: FormSubmitEvent<Schema>) {
   pending.value = true;
   const res = await useFetch("/api/Auth/login", {
     method: "post",
     body: { email: event.data.email, password: event.data.password },
   });
-  const temp = useCookie("current_session");
-  if (temp.value) {
-    session.value = temp.value;
-  }
-  if (process.client) {
-    localStorage.setItem("user", JSON.stringify(res.data.value));
-  }
 
-  pending.value = false;
-  return navigateTo("/");
+  console.log(res.data.value);
+
+  if (res.data.value) {
+    pending.value = false;
+    if (process.client) {
+      localStorage.setItem("user", JSON.stringify(res.data.value.user_info));
+      session.value = res.data.value.session_id;
+      role.value = res.data.value.user_info.basic_info.role;
+    }
+
+    if (res.data.value.user_info.basic_info.role === "Student") {
+      navigateTo("/ClassRegistration");
+    } else {
+      navigateTo("/AddClass");
+    }
+  }
 }
 </script>

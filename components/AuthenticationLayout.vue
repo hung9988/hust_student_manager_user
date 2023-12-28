@@ -1,107 +1,128 @@
 <template>
   <div class="fixed top-0 w-full bg-background-400">
-    <nav class="grid grid-cols-6 border-b border-gray-500 py-2">
-      <div
-        class="col-span-1 ml-5 flex items-center justify-start text-3xl font-semibold"
-      >
-        <div @click="test">HUST MANAGER</div>
+    <nav
+      class="flex items-center justify-between bg-background-500 p-6 text-white"
+    >
+      <div>
+        <h1 class="text-2xl font-bold">HUST MANAGER</h1>
       </div>
-      <div class="col-span-3"></div>
-      <div class="col-span-2 mr-2 space-y-2">
-        <div v-if="!user" class="col-span-1">
-          <div class="md:flex md:justify-end">
-            <ULink
-              to="/login"
-              class="flex items-center justify-center rounded-md border bg-accent-500 p-1 md:w-1/3"
-              >Log in</ULink
-            >
-          </div>
-        </div>
-
-        <div v-if="!user" class="col-span-1">
-          <div class="md:flex md:justify-end">
-            <ULink
-              to="/signup"
-              class="flex items-center justify-center rounded-md border bg-accent-500 p-1 md:w-1/3"
-              >Sign up</ULink
-            >
-          </div>
-        </div>
-        <div v-if="user" class="col-span-1">
-          <div class="md:flex md:justify-end">
-            <ULink
-              to="/login"
-              @click="logout"
-              class="flex items-center justify-center rounded-md border bg-accent-500 p-1 md:w-1/3"
-              >Logout</ULink
-            >
-          </div>
-        </div>
+      <div>
+        <button
+          @click="showModal = true"
+          class="rounded bg-white px-4 py-2 font-bold text-text-950"
+        >
+          Menu
+        </button>
       </div>
     </nav>
+    <USlideover v-model="showModal">
+      <div class="p-6">
+        <div class="mb-6 flex items-center justify-between">
+          <NuxtLink to="/"><h1 class="text-4xl font-bold">Home</h1> </NuxtLink>
+          <UButton
+            icon="i-heroicons-x-mark"
+            color="gray"
+            square
+            variant="solid"
+            @click="showModal = false"
+          >
+          </UButton>
+        </div>
+        <UDivider
+          :ui="{
+            border: {
+              base: 'dark:border-gray-600',
+              size: { horizontal: 'border-t-4' },
+            },
+          }"
+        ></UDivider>
+
+        <div v-if="!session">
+          <UButton
+            color="gray"
+            square
+            variant="ghost"
+            @click="
+              navigateTo('/login');
+              showModal = false;
+            "
+            ><div class="text-xl font-bold">Login</div>
+          </UButton>
+        </div>
+        <div v-if="!session">
+          <UButton
+            color="gray"
+            square
+            variant="ghost"
+            @click="
+              navigateTo('/signup');
+              showModal = false;
+            "
+            ><div class="text-xl font-bold">Sign Up</div>
+          </UButton>
+        </div>
+        <ul
+          v-if="session"
+          class="font-lexend mt-12 space-y-4 text-2xl font-thin"
+        >
+          <div v-if="role == 'Teacher'">
+            <li v-for="link in linkTeacher" :key="linkTeacher.label">
+              <NuxtLink
+                :to="link.to"
+                class="mb-10 flex items-center gap-3"
+                @click="showModal = false"
+              >
+                <div class="text-xl font-medium">{{ link.label }}</div>
+              </NuxtLink>
+            </li>
+          </div>
+          <div v-if="role == 'Student'">
+            <li v-for="link in linkStudent" :key="linkStudent.label">
+              <NuxtLink
+                :to="link.to"
+                class="mb-10 flex items-center gap-3"
+                @click="showModal = false"
+              >
+                <div class="text-xl font-medium">{{ link.label }}</div>
+              </NuxtLink>
+            </li>
+          </div>
+        </ul>
+      </div>
+      <div
+        v-if="session"
+        @click="logOut()"
+        class="mx-10 flex items-end justify-center rounded-md border py-2 hover:cursor-pointer hover:bg-background-500"
+      >
+        <div class="text-xl font-bold">Logout</div>
+      </div>
+    </USlideover>
   </div>
 </template>
 
-<script setup lang="ts">
-async function test() {
-  const card = ref([
-    { first: "ly", last: "thanh", age: 20 },
-    { second: "ly", last: "tnh", age: 30 },
-  ]);
-  await useFetch("/api/addclasses", {
-    method: "post",
-    body: { card: card.value },
-  });
-}
-import { ref, watch } from "vue";
-const user = useUser();
-async function logout() {
-  await useFetch("/api/Auth/logout", { method: "post" });
-  localStorage.removeItem("user");
+<script setup>
+import { ref } from "vue";
+const session = useCookie("session");
+const role = useCookie("role");
+const showModal = ref(false);
+const linkTeacher = ref([
+  { label: "Class Creation", to: "/AddClass" },
+  { label: "Class Deletion", to: "/DeleteClass" },
+]);
+const linkStudent = ref([
+  { label: "Class Registration", to: "/AddClass" },
+  { label: "Class Unregister", to: "/DeleteClass" },
+]);
 
-  user.value = "";
+async function logOut() {
+  const { data } = await useFetch("/api/Auth/logout", {
+    method: "post",
+  });
+
+  localStorage.removeItem("user");
+  role.value = "";
+  session.value = "";
+  showModal.value = false;
+  navigateTo("/login");
 }
-const items = [
-  [
-    {
-      label: "Profile",
-      avatar: {
-        src: "https://avatars.githubusercontent.com/u/739984?v=4",
-      },
-    },
-  ],
-  [
-    {
-      label: "Edit",
-      icon: "i-heroicons-pencil-square-20-solid",
-      shortcuts: ["E"],
-      click: () => {
-        console.log("Edit");
-      },
-    },
-    {
-      label: "Duplicate",
-      icon: "i-heroicons-document-duplicate-20-solid",
-      shortcuts: ["D"],
-      disabled: true,
-    },
-  ],
-  [
-    {
-      label: "Archive",
-      icon: "i-heroicons-archive-box-20-solid",
-    },
-    {
-      label: "Move",
-      icon: "i-heroicons-arrow-right-circle-20-solid",
-    },
-  ],
-  [
-    {
-      label: "Delete",
-      icon: "i-heroicons-trash-20-solid",
-      shortcuts: ["⌘", "D"],
-    },
-  ],
-];
 </script>
