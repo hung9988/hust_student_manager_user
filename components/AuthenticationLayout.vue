@@ -65,7 +65,7 @@
           v-if="session"
           class="font-lexend mt-12 space-y-4 text-2xl font-thin"
         >
-          <div v-if="role == 'Teacher'">
+          <div v-if="role == 'teacher'">
             <li v-for="link in linkTeacher" :key="linkTeacher.label">
               <NuxtLink
                 :to="link.to"
@@ -76,7 +76,7 @@
               </NuxtLink>
             </li>
           </div>
-          <div v-if="role == 'Student'">
+          <div v-if="role == 'student'">
             <li v-for="link in linkStudent" :key="linkStudent.label">
               <NuxtLink
                 :to="link.to"
@@ -110,8 +110,8 @@ const linkTeacher = ref([
   { label: "Class Deletion", to: "/DeleteClass" },
 ]);
 const linkStudent = ref([
-  { label: "Class Registration", to: "/AddClass" },
-  { label: "Class Unregister", to: "/DeleteClass" },
+  { label: "Class Registration", to: "/ClassRegistration" },
+  { label: "Class Unregister", to: "/UnregisterClass" },
 ]);
 
 async function logOut() {

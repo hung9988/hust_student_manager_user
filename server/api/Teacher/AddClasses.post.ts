@@ -12,12 +12,12 @@ export default defineEventHandler(async (event) => {
   /////////////////// END OF TESTING CODE ///////////////////////
   let values_classes = "values";
   for (const element of body.selected) {
-    values_classes += `('${element.subject_id}',${element.capacity}),`;
+    values_classes += `('${element.subject_id}',${element.capacity},'20231'),`;
   }
   values_classes = values_classes.slice(0, -1);
   const res = await db.execute(
     sql.raw(
-      `insert into classes(subject_id,capacity) ${values_classes} RETURNING *`,
+      `insert into classes(subject_id,capacity,semester) ${values_classes} RETURNING *`,
     ),
   );
 
@@ -29,8 +29,6 @@ export default defineEventHandler(async (event) => {
   }
   values_teacher = values_teacher.slice(0, -1);
   values_time_location = values_time_location.slice(0, -1);
-  console.log(values_teacher);
-  console.log(values_time_location);
 
   const temp = await db.execute(
     sql.raw(

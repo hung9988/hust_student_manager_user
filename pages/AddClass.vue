@@ -136,19 +136,14 @@ const filteredRows = computed(() => {
     });
   });
 });
-const user = useStorage("user", null);
+const temp = useStorage("user", null);
+const user = ref(JSON.parse(temp.value));
+if (user.value) {
+  console.log(user.value.basic_info.user_id);
+}
 
 async function send_classes() {
-  const { data } = await useFetch("/api/Teacher/AddClasses", {
-    method: "post",
-    body: {
-      user_id: JSON.parse(user.value).user_id,
-      selected: selected.value,
-    },
-  });
-  console.log(data.value.result);
-  isOpen.value = false;
-  selected.value = [];
+  console.log(selected.value);
 }
 </script>
 <template>
@@ -166,40 +161,52 @@ async function send_classes() {
           <div class="flex grow items-center justify-center text-2xl">
             Subject: {{ items.subject_id }}
           </div>
+
           <div>
-            <div class="mb-2 flex justify-center font-medium">Capacity</div>
+            <div class="mb-2 flex justify-center font-medium">
+              Number of classes
+            </div>
             <div class="flex items-center justify-center">
-              <UInput v-model="items.capacity" size="xl"></UInput>
+              <UInput v-model="items.class_number" size="xl"></UInput>
             </div>
           </div>
-          <div class="flex flex-row gap-4">
-            <UFormGroup
-              class="basis-1/2"
-              label="location"
-              :name="items.subject_id"
-              size="xl"
-            >
-              <UInput v-model="items.location"></UInput>
-            </UFormGroup>
-            <UFormGroup class="basis-1/2" label="Day of the week" size="xl">
-              <USelect v-model="items.day_of_week" :options="day_of_week" />
-            </UFormGroup>
-          </div>
-          <div class="flex flex-row gap-4">
-            <UFormGroup class="basis-1/2" label="start time" size="xl">
-              <USelect
-                v-model="items.start_time"
-                :options="time_period"
-                option-attribute="start_time"
-              />
-            </UFormGroup>
-            <UFormGroup class="basis-1/2" label="end time" size="xl">
-              <USelect
-                v-model="items.end_time"
-                :options="time_period"
-                option-attribute="end_time"
-              />
-            </UFormGroup>
+
+          <div v-for="classes in 2">
+            <div>
+              <div class="mb-2 flex justify-center font-medium">Capacity</div>
+              <div class="flex items-center justify-center">
+                <UInput v-model="items.capacity[classes]" size="xl"></UInput>
+              </div>
+            </div>
+            <div class="flex flex-row gap-4">
+              <UFormGroup
+                class="basis-1/2"
+                label="location"
+                :name="items.subject_id"
+                size="xl"
+              >
+                <UInput v-model="items.location"></UInput>
+              </UFormGroup>
+              <UFormGroup class="basis-1/2" label="Day of the week" size="xl">
+                <USelect v-model="items.day_of_week" :options="day_of_week" />
+              </UFormGroup>
+            </div>
+            <div class="flex flex-row gap-4">
+              <UFormGroup class="basis-1/2" label="start time" size="xl">
+                <USelect
+                  v-model="items.start_time"
+                  :options="time_period"
+                  option-attribute="start_time"
+                />
+              </UFormGroup>
+              <UFormGroup class="basis-1/2" label="end time" size="xl">
+                <USelect
+                  v-model="items.end_time"
+                  :options="time_period"
+                  option-attribute="end_time"
+                />
+              </UFormGroup>
+            </div>
           </div>
           <UDivider
             :ui="{

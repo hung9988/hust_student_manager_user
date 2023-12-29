@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
   }
   enrolled = enrolled.slice(0, -1);
   enrolled += ")";
-  console.log(enrolled);
+
   const res = await db.execute(
     sql.raw(
       `select class_id,count(class_id) from enrollment where class_id in ${enrolled} group by class_id`,
