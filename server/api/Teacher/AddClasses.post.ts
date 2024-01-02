@@ -1,39 +1,32 @@
-import db from "../../../drizzle/db";
+import { db_admin as db } from "../../../drizzle/db";
 import "../../../drizzle/schema";
 import { eq, lt, gte, ne, sql } from "drizzle-orm";
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
-  ///THIS IS FOR TESTING PURPOSE, DELETE WHEN DEPLOYING
-  // await db.execute(
-  //   sql.raw(
-  //     `delete from class_time_location;delete from classes_teachers;delete from classes;`,
-  //   ),
-  // );
-  /////////////////// END OF TESTING CODE ///////////////////////
+
   let values_classes = "values";
   for (const element of body.selected) {
-    values_classes += `('${element.subject_id}',${element.capacity},'20231'),`;
+    values_classes += `('${element.subject_id}',${element.capacity}),`;
   }
   values_classes = values_classes.slice(0, -1);
   const res = await db.execute(
     sql.raw(
-      `insert into classes(subject_id,capacity,semester) ${values_classes} RETURNING *`,
+      `insert into classes(subject_id,teacher_id,capacity) ${values_classes} RETURNING *`,
     ),
   );
 
-  let values_teacher = "values";
   let values_time_location = "values";
-  for (let [index, element] of body.selected.entries()) {
-    values_teacher += `(${res[index].class_id},'${body.user_id}'),`;
-    values_time_location += `(${res[index].class_id},'${element.start_time}','${element.end_time}','${element.day_of_week}','${element.location}'),`;
+  for (let [index1, element] of body.class.entries()) {
+    for (const [index2, TimeLocation] of element.location.entries()) {
+      values_time_location += `(${res[index1].class_id},'${element.start_time[index2]}','${element.end_time[index2]}','${element.day_of_week[index2]}','${element.location[index2]}'),`;
+    }
   }
-  values_teacher = values_teacher.slice(0, -1);
+
   values_time_location = values_time_location.slice(0, -1);
 
   const temp = await db.execute(
     sql.raw(
-      `insert into classes_teachers(class_id,teacher_id) ${values_teacher} RETURNING *;
-      insert into class_time_location(class_id,start_time,end_time,day_of_week,location) ${values_time_location} RETURNING *`,
+      `insert into class_time_location(class_id,start_time,end_time,day_of_week,location) ${values_time_location} RETURNING *`,
     ),
   );
 
