@@ -1,13 +1,20 @@
-import { db_teacher as db } from "../../drizzle/db";
-import { sql } from "drizzle-orm";
+import { db_admin as db } from "../../drizzle/db";
+import "../../drizzle/schema";
+import { eq, lt, gte, ne, sql } from "drizzle-orm";
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
-  let all_student_id = "(";
+  let enrolled = "(";
   for (const element of body.data) {
-    all_student_id += `${element},`;
+    enrolled += `${element.class_id},`;
   }
-  all_student_id = all_student_id.slice(0, -1);
-  all_student_id += ")";
+  enrolled = enrolled.slice(0, -1);
+  enrolled += ")";
 
-  return { all_student_id: all_student_id };
+  const res = await db.execute(
+    sql.raw(
+      `select class_id,count(class_id) from enrollment where class_id in ${enrolled} group by class_id`,
+    ),
+  );
+
+  return { res };
 });
