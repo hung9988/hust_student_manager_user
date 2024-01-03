@@ -1,4 +1,4 @@
-import { db_teacher as db } from "../../drizzle/db";
+import { db_teacher as db } from "../../../drizzle/db";
 import { sql } from "drizzle-orm";
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);

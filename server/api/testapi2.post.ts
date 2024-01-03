@@ -1,5 +1,5 @@
 import { db_student as db } from "../../drizzle/db";
-import { teacher, users } from "../../drizzle/schema";
+
 import { eq, lt, gte, ne, sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 export default defineEventHandler(async (event) => {
