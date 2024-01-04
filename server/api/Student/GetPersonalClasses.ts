@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   const res = await db.execute(
     sql.raw(
-      `select * from class_all where class_id in (select class_id from enrollment where student_id='${body.student_id}')`,
+      `select * from classes_full where class_id in (select class_id from enrollments where student_id='${body.student_id}')`,
     ),
   );
   return { res };

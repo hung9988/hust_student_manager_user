@@ -1,26 +1,21 @@
 import {
   pgTable,
-  foreignKey,
+  unique,
   pgEnum,
+  serial,
+  varchar,
+  foreignKey,
   integer,
   boolean,
-  varchar,
-  unique,
+  time,
   numeric,
   text,
-  serial,
+  index,
   date,
-  time,
   primaryKey,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
-export const roles = pgEnum("roles", [
-  "Enterprise",
-  "Admin",
-  "Student",
-  "Teacher",
-]);
 export const scholarshipStatus = pgEnum("scholarship_status", [
   "close",
   "open",
@@ -35,79 +30,12 @@ export const weekDays = pgEnum("week_days", [
   "Tuesday",
   "Monday",
 ]);
-
-export const students = pgTable("students", {
-  studentId: integer("student_id")
-    .primaryKey()
-    .notNull()
-    .references(() => users.userId, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
-  programId: integer("program_id")
-    .notNull()
-    .references(() => programs.programId, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
-  enrolledYear: integer("enrolled_year").notNull(),
-  warningLevel: integer("warning_level").default(0).notNull(),
-  semesterCredit: integer("semester_credit").default(28).notNull(),
-  graduated: boolean("graduated").default(false).notNull(),
-});
-
-export const teachers = pgTable("teachers", {
-  teacherId: integer("teacher_id")
-    .primaryKey()
-    .notNull()
-    .references(() => users.userId, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
-  schoolId: integer("school_id")
-    .notNull()
-    .references(() => schools.schoolId, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
-  hiredYear: integer("hired_year").notNull(),
-  qualification: varchar("qualification").notNull(),
-});
-
-export const enterprises = pgTable(
-  "enterprises",
-  {
-    enterpriseId: integer("enterprise_id")
-      .primaryKey()
-      .notNull()
-      .references(() => users.userId, {
-        onDelete: "cascade",
-        onUpdate: "cascade",
-      }),
-    enterpriseName: varchar("enterprise_name").notNull(),
-    contact: varchar("contact").notNull(),
-    verified: boolean("verified").default(false).notNull(),
-  },
-  (table) => {
-    return {
-      uniqueEnterprise: unique("unique_enterprise").on(table.enterpriseName),
-    };
-  },
-);
-
-export const subjects = pgTable("subjects", {
-  subjectId: varchar("subject_id").primaryKey().notNull(),
-  subjectName: varchar("subject_name").notNull(),
-  schoolId: integer("school_id")
-    .notNull()
-    .references(() => schools.schoolId, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
-  credit: numeric("credit").default("0").notNull(),
-  weight: numeric("weight").default("0").notNull(),
-  subjectDescription: text("subject_description"),
-});
+export const roles = pgEnum("roles", [
+  "enterprise",
+  "admin",
+  "student",
+  "teacher",
+]);
 
 export const schools = pgTable(
   "schools",
@@ -123,81 +51,6 @@ export const schools = pgTable(
     };
   },
 );
-
-export const tuitions = pgTable("tuitions", {
-  studentId: integer("student_id")
-    .primaryKey()
-    .notNull()
-    .references(() => students.studentId, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
-  debt: numeric("debt").notNull(),
-});
-
-export const programs = pgTable(
-  "programs",
-  {
-    programId: serial("program_id").primaryKey().notNull(),
-    schoolId: integer("school_id")
-      .notNull()
-      .references(() => schools.schoolId, {
-        onDelete: "cascade",
-        onUpdate: "cascade",
-      }),
-    programName: varchar("program_name").notNull(),
-    programDescription: text("program_description"),
-    totalCredits: numeric("total_credits"),
-  },
-  (table) => {
-    return {
-      uniqueProgram: unique("unique_program").on(table.programName),
-    };
-  },
-);
-
-export const users = pgTable(
-  "users",
-  {
-    userId: serial("user_id").primaryKey().notNull(),
-    email: varchar("email").notNull(),
-    encryptedPassword: varchar("encrypted_password").notNull(),
-    role: roles("role"),
-    firstName: varchar("first_name"),
-    lastName: varchar("last_name"),
-    dateOfBirth: date("date_of_birth"),
-  },
-  (table) => {
-    return {
-      uniqueEmail: unique("unique_email").on(table.email),
-    };
-  },
-);
-
-export const scholarships = pgTable("scholarships", {
-  scholarshipId: serial("scholarship_id").primaryKey().notNull(),
-  enterpriseId: integer("enterprise_id").references(
-    () => enterprises.enterpriseId,
-    { onDelete: "cascade", onUpdate: "cascade" },
-  ),
-  amount: numeric("amount"),
-  scholarshipDescription: text("scholarship_description"),
-  status: scholarshipStatus("status").default("unverified"),
-  quantity: integer("quantity"),
-});
-
-export const classesTimeLocation = pgTable("classes_time_location", {
-  classId: integer("class_id")
-    .notNull()
-    .references(() => classes.classId, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
-  dayOfWeek: weekDays("day_of_week").notNull(),
-  location: varchar("location").notNull(),
-  startTime: time("start_time").notNull(),
-  endTime: time("end_time").notNull(),
-});
 
 export const classes = pgTable(
   "classes",
@@ -231,31 +84,166 @@ export const classes = pgTable(
   },
 );
 
-export const subjectsPrograms = pgTable(
-  "subjects_programs",
+export const classesTimeLocation = pgTable("classes_time_location", {
+  classId: integer("class_id")
+    .notNull()
+    .references(() => classes.classId, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
+  dayOfWeek: weekDays("day_of_week").notNull(),
+  location: varchar("location").notNull(),
+  startTime: time("start_time").notNull(),
+  endTime: time("end_time").notNull(),
+});
+
+export const scholarships = pgTable("scholarships", {
+  scholarshipId: serial("scholarship_id").primaryKey().notNull(),
+  enterpriseId: integer("enterprise_id").references(
+    () => enterprises.enterpriseId,
+    { onDelete: "cascade", onUpdate: "cascade" },
+  ),
+  amount: numeric("amount"),
+  scholarshipDescription: text("scholarship_description"),
+  status: scholarshipStatus("status").default("unverified"),
+  quantity: integer("quantity"),
+});
+
+export const users = pgTable(
+  "users",
   {
+    userId: serial("user_id").primaryKey().notNull(),
+    email: varchar("email").notNull(),
+    encryptedPassword: varchar("encrypted_password").notNull(),
+    role: roles("role"),
+    firstName: varchar("first_name"),
+    lastName: varchar("last_name"),
+    dateOfBirth: date("date_of_birth"),
+  },
+  (table) => {
+    return {
+      idxUsersUserId: index("idx_users_user_id").on(table.userId),
+      uniqueEmail: unique("unique_email").on(table.email),
+    };
+  },
+);
+
+export const students = pgTable(
+  "students",
+  {
+    studentId: integer("student_id")
+      .primaryKey()
+      .notNull()
+      .references(() => users.userId, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
     programId: integer("program_id")
       .notNull()
       .references(() => programs.programId, {
         onDelete: "cascade",
         onUpdate: "cascade",
       }),
-    subjectId: varchar("subject_id")
-      .notNull()
-      .references(() => subjects.subjectId, {
-        onDelete: "cascade",
-        onUpdate: "cascade",
-      }),
+    enrolledYear: integer("enrolled_year").notNull(),
+    warningLevel: integer("warning_level").default(0).notNull(),
+    semesterCredit: integer("semester_credit").default(28).notNull(),
+    graduated: boolean("graduated").default(false).notNull(),
   },
   (table) => {
     return {
-      subjectsProgramsPkey: primaryKey({
-        columns: [table.programId, table.subjectId],
-        name: "Subjects_Programs_pkey",
-      }),
+      idxStudents: index("idx_students").on(
+        table.studentId,
+        table.programId,
+        table.semesterCredit,
+      ),
     };
   },
 );
+
+export const subjects = pgTable("subjects", {
+  subjectId: varchar("subject_id").primaryKey().notNull(),
+  subjectName: varchar("subject_name").notNull(),
+  schoolId: integer("school_id")
+    .notNull()
+    .references(() => schools.schoolId, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
+  credit: numeric("credit").default("0").notNull(),
+  weight: numeric("weight").default("0").notNull(),
+  subjectDescription: text("subject_description"),
+});
+
+export const programs = pgTable(
+  "programs",
+  {
+    programId: serial("program_id").primaryKey().notNull(),
+    schoolId: integer("school_id")
+      .notNull()
+      .references(() => schools.schoolId, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    programName: varchar("program_name").notNull(),
+    programDescription: text("program_description"),
+    totalCredits: numeric("total_credits"),
+  },
+  (table) => {
+    return {
+      uniqueProgram: unique("unique_program").on(table.programName),
+    };
+  },
+);
+
+export const tuitions = pgTable("tuitions", {
+  studentId: integer("student_id")
+    .primaryKey()
+    .notNull()
+    .references(() => students.studentId, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
+  debt: numeric("debt").notNull(),
+});
+
+export const enterprises = pgTable(
+  "enterprises",
+  {
+    enterpriseId: integer("enterprise_id")
+      .primaryKey()
+      .notNull()
+      .references(() => users.userId, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    enterpriseName: varchar("enterprise_name").notNull(),
+    contact: varchar("contact").notNull(),
+    verified: boolean("verified").default(false).notNull(),
+  },
+  (table) => {
+    return {
+      uniqueEnterprise: unique("unique_enterprise").on(table.enterpriseName),
+    };
+  },
+);
+
+export const teachers = pgTable("teachers", {
+  teacherId: integer("teacher_id")
+    .primaryKey()
+    .notNull()
+    .references(() => users.userId, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
+  schoolId: integer("school_id")
+    .notNull()
+    .references(() => schools.schoolId, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
+  hiredYear: integer("hired_year").notNull(),
+  qualification: varchar("qualification").notNull(),
+});
 
 export const subjectsConditions = pgTable(
   "subjects_conditions",
@@ -278,6 +266,32 @@ export const subjectsConditions = pgTable(
       subjectsConditionsPkey: primaryKey({
         columns: [table.mainSubjectId, table.requiredSubjectId],
         name: "Subjects_Conditions_pkey",
+      }),
+    };
+  },
+);
+
+export const subjectsPrograms = pgTable(
+  "subjects_programs",
+  {
+    programId: integer("program_id")
+      .notNull()
+      .references(() => programs.programId, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    subjectId: varchar("subject_id")
+      .notNull()
+      .references(() => subjects.subjectId, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+  },
+  (table) => {
+    return {
+      subjectsProgramsPkey: primaryKey({
+        columns: [table.programId, table.subjectId],
+        name: "Subjects_Programs_pkey",
       }),
     };
   },

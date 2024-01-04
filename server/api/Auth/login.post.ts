@@ -6,26 +6,39 @@ export default defineEventHandler(async (event) => {
   const user = await db.execute(
     sql.raw(`select * from users where email = '${body.email}'`),
   );
-
-  if (bcrypt.compareSync(body.password, String(user[0].encrypted_password))) {
+  //if (bcrypt.compareSync(body.password, String(user[0].encrypted_password)))
+  if (body.password === user[0].encrypted_password) {
+    delete user[0].encrypted_password;
     let user_role = user[0].role + "s";
 
     let user_role_id = user[0].role + "_id";
+    let res: any[] = [];
+    let debuger: any[] = [];
+    const result = await db.transaction(async (db) => {
+      await db.execute(
+        sql.raw(`set session myapp.user_id= ${user[0].user_id};`),
+      );
+      await db.execute(
+        sql.raw(`set session myapp.user_role= '${user[0].role}';`),
+      );
+      const res = await db.execute(
+        sql.raw(
+          `select * from ${user_role} where ${user_role_id} = ${user[0].user_id};`,
+        ),
+      );
+      const debuger = await db.execute(
+        sql.raw(`select * from current_setting('myapp.user_id');`),
+      );
+      return {
+        user_info: {
+          basic_info: user[0],
+          extra_info: res[0],
+          debugging: debuger[0],
+        },
+      };
+    });
 
-    const res = await db.execute(
-      sql.raw(
-        `select * from ${user_role} where ${user_role_id} = ${user[0].user_id}`,
-      ),
-    );
-
-    delete user[0].encrypted_password;
-
-    return {
-      user_info: {
-        basic_info: user[0],
-        extra_info: res[0],
-      },
-    };
+    return result;
   }
 
   return undefined;

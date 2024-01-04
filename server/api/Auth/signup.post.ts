@@ -1,4 +1,4 @@
-import { db_guest as db } from "../../../drizzle/db";
+import { db_user as db } from "../../../drizzle/db";
 import { users } from "../../../drizzle/schema";
 import { eq, lt, gte, ne, sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";

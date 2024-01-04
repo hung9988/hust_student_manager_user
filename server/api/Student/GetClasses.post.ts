@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
   const classes = await db.execute(
     sql.raw(
       `
-        select * from class_all
+        select * from classes_full
       where
         subject_id ILIKE ${body.query}
         OR class_id :: varchar ILIKE ${body.query} OFFSET ${
@@ -21,10 +21,9 @@ export default defineEventHandler(async (event) => {
   );
   classes.forEach((element) => {
     element.last_name = element.last_name + " " + element.first_name;
-    element.enrolled =
-      (element.enrolled ? element.enrolled : "0") + "/" + element.capacity;
+    element.enrolled = element.enrolled_count + "/" + element.capacity;
   });
   // WORK IN PROGRESS
-  console.log(classes + "THIS IS HERE");
+
   return { classes };
 });

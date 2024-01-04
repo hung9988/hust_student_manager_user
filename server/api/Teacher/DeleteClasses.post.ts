@@ -1,4 +1,4 @@
-import { db_admin as db } from "../../../drizzle/db";
+import { db_user as db } from "../../../drizzle/db";
 import "../../../drizzle/schema";
 import { eq, lt, gte, ne, sql } from "drizzle-orm";
 export default defineEventHandler(async (event) => {
@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
 
   let class_id = "(";
   for (const element of body.data) {
-    class_id += `${element.class_id},`;
+    class_id += `${element},`;
   }
   class_id = class_id.slice(0, -1);
   class_id += ")";
