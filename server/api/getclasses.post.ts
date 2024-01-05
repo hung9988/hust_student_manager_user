@@ -1,55 +1,16 @@
-import { db_admin as db } from "../../drizzle/db";
-import "../../drizzle/schema";
+import { db_user as db } from "../../drizzle/db";
+
 import { eq, lt, gte, ne, sql } from "drizzle-orm";
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
-
+  const session = event.headers.get("session");
+  await db.execute(sql.raw(`CALL set_user_id_and_role('${session}');`));
   body.query = "'%" + body.query + "%'";
   console.log(body.query);
   const classes = await db.execute(
-    // sql.raw(
-    //   `with classes_info as (select b.*,a.subject_id,a.capacity,a.is_open from classes as a join class_time_location as b on a.class_id=b.class_id)
-    //   select * from classes_info where subject_id ILIKE ${
-    //     body.query
-    //   } OR class_id::varchar ILIKE ${body.query}
-    //   OFFSET ${(body.page - 1) * body.pageCount} LIMIT ${body.pageCount}`,
-    // ),
     sql.raw(
-      `with classes_info as (
-        select
-          b.*,
-          a.subject_id,
-          a.capacity,
-          a.is_open
-        from
-          classes as a
-          join class_time_location as b on a.class_id = b.class_id
-      ),
-  
-      class_final as (
-        select
-          c.class_id,
-          c.subject_id,
-          c.capacity,
-          c.is_open,
-          u.first_name,
-          u.last_name,
-          c.start_time,
-          c.end_time,
-          c.day_of_week,
-          c.location
-        from
-          classes_info c,
-          classes_teachers ct,
-          users u
-        where
-          c.class_id = ct.class_id
-          and ct.teacher_id = u.user_id
-      )
-      select
-        *
-      from
-        class_final
+      `
+        select cf.*,t.last_name,t.first_name from classes_full cf join users t on cf.teacher_id=t.user_id
       where
         subject_id ILIKE ${body.query}
         OR class_id :: varchar ILIKE ${body.query} OFFSET ${
@@ -59,6 +20,11 @@ export default defineEventHandler(async (event) => {
         ${body.pageCount}`,
     ),
   );
+  classes.forEach((element) => {
+    element.full_name = element.last_name + " " + element.first_name;
+    element.enrolled = element.enrolled_count + "/" + element.capacity;
+  });
   // WORK IN PROGRESS
+
   return { classes };
 });

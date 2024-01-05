@@ -3,7 +3,8 @@ import "../../../drizzle/schema";
 import { eq, lt, gte, ne, sql } from "drizzle-orm";
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
-
+  const session = event.headers.get("session");
+  await db.execute(sql.raw(`CALL set_user_id_and_role('${session}');`));
   let value_class_id = "";
   for (const element of body.data) {
     value_class_id += `${element},`;

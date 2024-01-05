@@ -10,16 +10,18 @@ export default defineEventHandler(async (event) => {
   if (body.password === user[0].encrypted_password) {
     delete user[0].encrypted_password;
     let user_role = user[0].role + "s";
-
     let user_role_id = user[0].role + "_id";
     let res: any[] = [];
     let debuger: any[] = [];
+
     const result = await db.transaction(async (db) => {
-      await db.execute(
-        sql.raw(`set session myapp.user_id= ${user[0].user_id};`),
+      const session = await db.execute(
+        sql.raw(
+          `INSERT INTO sessions(user_id,role) VALUES (${user[0].user_id},'${user[0].role}') RETURNING session_id;`,
+        ),
       );
       await db.execute(
-        sql.raw(`set session myapp.user_role= '${user[0].role}';`),
+        sql.raw(`CALL set_user_id_and_role('${session[0].session_id}');`),
       );
       const res = await db.execute(
         sql.raw(
@@ -30,6 +32,7 @@ export default defineEventHandler(async (event) => {
         sql.raw(`select * from current_setting('myapp.user_id');`),
       );
       return {
+        session: session[0].session_id,
         user_info: {
           basic_info: user[0],
           extra_info: res[0],

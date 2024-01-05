@@ -5,7 +5,7 @@ import { sql } from "drizzle-orm";
 export default defineEventHandler(async (event) => {
   try {
     const res = await db.execute(
-      sql.raw(`SELECT * FROM current_setting('currentUser.role');`),
+      sql.raw(`SELECT * FROM current_setting('myapp.user_id');`),
     );
     return { res };
   } catch (err) {
