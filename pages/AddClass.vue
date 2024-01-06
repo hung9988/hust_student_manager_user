@@ -20,11 +20,7 @@ const columns = [
     label: "credits",
     sortable: true,
   },
-  {
-    key: "credit_tuition",
-    label: " Tín chỉ Học phí",
-    sortable: true,
-  },
+
   {
     key: "weight",
     label: "Trọng số",
@@ -102,14 +98,19 @@ const day_of_week = [
   "Friday",
   "Saturday",
 ];
-const { data } = await useFetch("/api/GetSubjects", {
-  method: "post",
-  body: {
-    query: query.value,
-    page: page.value,
-    pageCount: pageCount.value,
+const { data } = await useFetch(
+  "/api/GetSubjects",
+  {
+    method: "post",
+    body: {
+      query: query.value,
+      page: page.value,
+      pageCount: pageCount.value,
+    },
   },
-});
+  { watch: [page, pageCount, query] },
+);
+
 const subjects = ref();
 subjects.value = data.value?.subjects;
 const selected = ref([]);
@@ -125,17 +126,7 @@ function select(row) {
   }
 }
 const isOpen = ref(false);
-const filteredRows = computed(() => {
-  if (!query.value) {
-    return subjects.value;
-  }
-
-  return subjects.value.filter((person) => {
-    return Object.values(person).some((value) => {
-      return String(value).toLowerCase().includes(query.value.toLowerCase());
-    });
-  });
-});
+const filteredRows = computed(() => {});
 const temp = useStorage("user", null);
 const user = ref(JSON.parse(temp.value));
 if (user.value) {

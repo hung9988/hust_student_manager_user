@@ -1,6 +1,7 @@
 <template>
   <div class="min-h-screen bg-background-900">
-    <div class="flex min-h-screen items-center justify-center">
+    <div class="flex min-h-screen flex-col items-center justify-center">
+      <div class="mb-8 text-4xl font-bold text-white">ADMIN LOGIN</div>
       <UCard
         class="mx-6 w-full max-w-lg space-y-12 border border-slate-500 pt-8"
       >
@@ -91,8 +92,10 @@ async function submit(event: FormSubmitEvent<Schema>) {
 
     if (res.data.value.user_info.basic_info.role === "Student") {
       navigateTo("/ClassRegistration");
-    } else {
+    } else if (res.data.value.user_info.basic_info.role === "Teacher") {
       navigateTo("/AddClass");
+    } else if (res.data.value.user_info.basic_info.role === "Admin") {
+      navigateTo("/Admin");
     }
   }
 }

@@ -13,6 +13,7 @@ import {
   index,
   date,
   primaryKey,
+  uuid,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
@@ -324,6 +325,31 @@ export const studentsScholarships = pgTable(
   },
 );
 
+export const sessions = pgTable(
+  "sessions",
+  {
+    sessionId: uuid("session_id")
+      .default(sql`uuid_generate_v4()`)
+      .notNull(),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.userId, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    role: roles("role").notNull(),
+  },
+  (table) => {
+    return {
+      idxHashedSession: index("idx_hashed_session").on(table.sessionId),
+      sessionsPkey: primaryKey({
+        columns: [table.sessionId, table.userId],
+        name: "sessions_pkey",
+      }),
+    };
+  },
+);
+
 export const enrollments = pgTable(
   "enrollments",
   {
@@ -346,6 +372,11 @@ export const enrollments = pgTable(
   },
   (table) => {
     return {
+      idxStudentClass: index("idx_student_class").on(
+        table.classId,
+        table.studentId,
+      ),
+      idxStudentOnly: index("idx_student_only").on(table.studentId),
       enrollmentsPkey: primaryKey({
         columns: [table.classId, table.studentId],
         name: "Enrollments_pkey",

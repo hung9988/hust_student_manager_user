@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
 
   const scholarships = await db.execute(
     sql.raw(
-      `select * from scholarships where status='unverified'  OFFSET ${
+      `select * from scholarships where status='open'  OFFSET ${
         (body.page - 1) * body.pageCount
       } LIMIT ${body.pageCount}`,
     ),
