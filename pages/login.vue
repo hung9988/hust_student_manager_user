@@ -90,10 +90,12 @@ async function submit(event: FormSubmitEvent<Schema>) {
       user_id.value = res.data.value.user_info.basic_info.user_id;
     }
 
-    if (res.data.value.user_info.basic_info.role === "Student") {
+    if (res.data.value.user_info.basic_info.role === "student") {
       navigateTo("/ClassRegistration");
-    } else {
+    } else if (res.data.value.user_info.basic_info.role === "teacher") {
       navigateTo("/AddClass");
+    } else if (res.data.value.user_info.basic_info.role === "enterprise") {
+      navigateTo("/CreateScholarship");
     }
   }
 }

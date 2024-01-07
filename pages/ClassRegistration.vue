@@ -84,9 +84,9 @@ async function handle_verify() {
 </script>
 <template>
   <div class="min-h-screen bg-background-900">
-    <div class="space-y-10 py-[10vh]">
+    <div class="space-y-10">
       <div class="flex justify-center">
-        <div class="mb-10 text-4xl font-semibold">Class Registration</div>
+        <div class="mb-10 text-4xl font-semibold">Register Classes</div>
       </div>
       <div class="">
         <div class="flex items-center justify-center">

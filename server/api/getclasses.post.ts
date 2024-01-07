@@ -1,7 +1,6 @@
-import { parse } from "vue/compiler-sfc";
 import { db_user as db } from "../../drizzle/db";
 
-import { eq, lt, gte, ne, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   const session = getCookie(event, "session");

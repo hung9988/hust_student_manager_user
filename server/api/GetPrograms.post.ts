@@ -3,9 +3,11 @@ import { sql } from "drizzle-orm";
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
 
-  const programs = await db.execute(
+  let programs: any[] = await db.execute(
     sql.raw(`select program_id,program_name from programs;`),
   );
-
-  return programs;
+  programs = programs.map((program) => {
+    return { label: program.program_name, value: program.program_id };
+  });
+  return { programs };
 });

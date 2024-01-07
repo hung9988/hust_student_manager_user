@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed top-0 w-full bg-background-400">
+  <div class="sticky top-0 z-50 w-full bg-background-400">
     <nav
       class="flex items-center justify-between bg-background-500 p-6 text-white"
     >
@@ -106,12 +106,12 @@ const session = useCookie("session");
 const role = useCookie("role");
 const showModal = ref(false);
 const linkTeacher = ref([
-  { label: "Class Creation", to: "/AddClass" },
-  { label: "Class Deletion", to: "/DeleteClass" },
+  { label: "Create Classes", to: "/AddClass" },
+  { label: "Delete Classes", to: "/DeleteClass" },
 ]);
 const linkStudent = ref([
-  { label: "Class Registration", to: "/ClassRegistration" },
-  { label: "Class Unregister", to: "/UnregisterClass" },
+  { label: "Register Classes", to: "/ClassRegistration" },
+  { label: "Unregister Classes", to: "/UnregisterClass" },
 ]);
 
 async function logOut() {

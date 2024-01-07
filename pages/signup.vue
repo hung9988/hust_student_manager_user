@@ -42,13 +42,7 @@
               <UInput v-model="state.passwordConfirm" type="password" />
             </UFormGroup>
           </div>
-          <UFormGroup
-            :ui="{ label: { base: 'font-bold' } }"
-            label="Choose your role"
-            size="xl"
-          >
-            <USelect v-model="state.role" :options="roles" />
-          </UFormGroup>
+
           <div class="space-y-4" v-if="state.role == 'student'">
             <div class="flex flex-row gap-4">
               <UFormGroup
@@ -86,7 +80,10 @@
                 name="program"
                 size="xl"
               >
-                <USelect v-model="state.program_id" :options="programs" />
+                <USelect
+                  v-model="state.program_id"
+                  :options="programs.programs"
+                />
               </UFormGroup>
               <UFormGroup
                 :ui="{ label: { base: 'font-bold' } }"
@@ -99,28 +96,6 @@
                   v-model="state.enrolled_year"
                   :options="enrolled_years"
                 />
-              </UFormGroup>
-            </div>
-          </div>
-          <div v-if="state.role == 'enterprise'">
-            <div class="flex flex-row gap-4">
-              <UFormGroup
-                :ui="{ label: { base: 'font-bold' } }"
-                class="basis-1/2"
-                label="Enterprise name"
-                name="nterprise_name"
-                size="xl"
-              >
-                <UInput v-model="state.enteprise_name" />
-              </UFormGroup>
-              <UFormGroup
-                :ui="{ label: { base: 'font-bold' } }"
-                class="basis-1/2"
-                label="Contact"
-                name="contact"
-                size="xl"
-              >
-                <UInput v-model="state.contact" />
               </UFormGroup>
             </div>
           </div>
@@ -143,22 +118,15 @@
   </div>
 </template>
 <script setup>
-import { isJSDocOptionalType } from "typescript";
-
 const enrolled_years = ref([2023, 2022, 2021, 2020, 2019, 2018, 2017]);
 const pending = ref(false);
 const roles = ref([
   { label: "Student", value: "student" },
   { label: "Enterprise", value: "enterprise" },
 ]);
-const state = ref({ email: undefined, password: undefined, role: undefined });
-const { data } = useFetch("/api/GetPrograms", { method: "POST" });
-const programs = ref(data.value);
-if (programs.value) {
-  programs.value = programs.value.map((program) => {
-    return { label: program.program_name, value: program.program_id };
-  });
-}
+const state = ref({ email: undefined, password: undefined, role: "student" });
+const { data: programs } = useFetch("/api/GetPrograms", { method: "POST" });
+
 async function submit() {
   const { data } = await useFetch("/api/Auth/signup", {
     method: "POST",

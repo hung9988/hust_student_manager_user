@@ -1,6 +1,6 @@
 <template>
   <div>
-    <AuthenticationLayout />
+    <Navbar />
     <slot />
   </div>
 </template>

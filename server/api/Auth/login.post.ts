@@ -10,8 +10,6 @@ export default defineEventHandler(async (event) => {
     delete user[0].encrypted_password;
     let user_role = user[0].role + "s";
     let user_role_id = user[0].role + "_id";
-    let res: any[] = [];
-    let debuger: any[] = [];
 
     const result = await db.transaction(async (db) => {
       const session = await db.execute(
@@ -35,7 +33,6 @@ export default defineEventHandler(async (event) => {
         user_info: {
           basic_info: user[0],
           extra_info: res[0],
-          debugging: debuger[0],
         },
       };
     });
