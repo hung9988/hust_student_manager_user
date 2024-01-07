@@ -3,7 +3,8 @@ import { sql } from "drizzle-orm";
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
-
+  const session = getCookie(event, "session");
+  await db.execute(sql.raw(`CALL set_user_id_and_role('${session}');`));
   const result = db.transaction(async (db) => {
     const res = await db.execute(
       sql.raw(

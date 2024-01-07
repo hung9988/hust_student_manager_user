@@ -1,9 +1,11 @@
 <script setup>
 import { useStorage } from "@vueuse/core";
+import { refDebounced } from "@vueuse/core";
 const page = ref(1);
 const pageCount = ref(8);
-const count = ref(1);
+
 const query = ref("");
+const debounced = refDebounced(query, 150);
 const columns = [
   {
     key: "class_id",
@@ -41,14 +43,6 @@ const columns = [
   },
 ];
 
-const { data: classes, refresh: refreshget } = await useFetch(
-  "/api/Student/GetClasses",
-  {
-    method: "post",
-    body: { query: query.value, page: page.value, pageCount: pageCount.value },
-  },
-);
-
 const selected = ref([]);
 function select(row) {
   const index = selected.value.findIndex(
@@ -61,38 +55,38 @@ function select(row) {
     selected.value.splice(index, 1);
   }
 }
-const isOpen = ref(false);
-const filteredRows = computed(() => {
-  if (!query.value) {
-    return classes.value.classes;
-  }
+const user_id = useCookie("user_id");
 
-  return classes.value.classes.filter((person) => {
-    return Object.values(person).some((value) => {
-      return String(value).toLowerCase().includes(query.value.toLowerCase());
-    });
-  });
+const { data: classes, refresh } = await useFetch("/api/GetClasses", {
+  method: "POST",
+  body: {
+    user_id: user_id,
+    query: debounced,
+    page: page,
+    pageCount: pageCount,
+  },
 });
 
-const user = useStorage("user", null);
-async function register_classes() {
-  const { data } = await useFetch("/api/Student/RegisterClasses", {
-    method: "post",
+async function handle_verify() {
+  selected.value = selected.value.map((item) => item.class_id);
+  console.log(selected.value);
+  const res = await useFetch("/api/Student/RegisterClasses", {
+    method: "POST",
     body: {
-      user_id: JSON.parse(user.value).user_id,
+      user_id: user_id.value,
       data: selected.value,
-      semester: "2023-2",
     },
   });
+  if (res) console.log(res);
   selected.value = [];
-  refreshget();
+  refresh();
 }
 </script>
 <template>
   <div class="min-h-screen bg-background-900">
     <div class="space-y-10 py-[10vh]">
       <div class="flex justify-center">
-        <div class="mb-10 text-4xl font-semibold">CLASS REGISTRATION</div>
+        <div class="mb-10 text-4xl font-semibold">Class Registration</div>
       </div>
       <div class="">
         <div class="flex items-center justify-center">
@@ -109,25 +103,25 @@ async function register_classes() {
         v-model="selected"
         class="mx-10"
         :columns="columns"
-        :rows="filteredRows"
+        :rows="classes.classes"
         @select="select"
       />
       <div class="grid grid-cols-2">
         <div class="col-span-1">
           <UPagination
             class="grid-col mx-10"
-            v-if="count"
+            v-if="classes.totalrows"
             v-model="page"
             :page-count="pageCount"
-            :total="count"
+            :total="Number(classes.totalrows[0].count)"
           />
         </div>
         <div class="col-span-1 flex justify-end">
           <UButton
             :ui="{ font: 'font-bold' }"
             class="mr-10 flex w-1/3 items-center justify-center"
-            @click="register_classes"
-            >Register</UButton
+            @click="handle_verify"
+            >Submit</UButton
           >
         </div>
       </div>

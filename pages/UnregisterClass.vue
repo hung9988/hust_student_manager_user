@@ -4,6 +4,7 @@ const page = ref(1);
 const pageCount = ref(8);
 const count = ref(1);
 const query = ref("");
+const user = useStorage("user", null);
 const columns = [
   {
     key: "class_id",
@@ -40,12 +41,16 @@ const columns = [
     label: "Capacity",
   },
 ];
+const semester = ref("20232");
 
 const { data: classes, refresh: refreshget } = await useFetch(
   "/api/Student/GetPersonalClasses",
   {
     method: "post",
-    body: { query: query.value, page: page.value, pageCount: pageCount.value },
+    body: {
+      semester: semester,
+      student_id: JSON.parse(user.value).basic_info.user_id,
+    },
   },
 );
 
@@ -62,24 +67,12 @@ function select(row) {
   }
 }
 const isOpen = ref(false);
-const filteredRows = computed(() => {
-  if (!query.value) {
-    return classes.value.classes;
-  }
 
-  return classes.value.classes.filter((person) => {
-    return Object.values(person).some((value) => {
-      return String(value).toLowerCase().includes(query.value.toLowerCase());
-    });
-  });
-});
-
-const user = useStorage("user", null);
 async function unregister_classes() {
   const { data } = await useFetch("/api/Student/UnregisterClasses", {
     method: "post",
     body: {
-      student_id: JSON.parse(user.value).user_id,
+      student_id: JSON.parse(user.value).basic_info.user_id,
       data: selected.value,
     },
   });
@@ -93,7 +86,7 @@ async function unregister_classes() {
       <div class="flex justify-center">
         <div class="mb-10 text-4xl font-semibold">UNREGISTER CLASSES</div>
       </div>
-      <div class="">
+      <div v-if="user" class="">
         <div class="flex items-center justify-center">
           <UInput
             class="w-1/2"
@@ -105,10 +98,11 @@ async function unregister_classes() {
         </div>
       </div>
       <UTable
+        v-if="user"
         v-model="selected"
         class="mx-10"
         :columns="columns"
-        :rows="filteredRows"
+        :rows="classes.classes"
         @select="select"
       />
       <div class="grid grid-cols-2">

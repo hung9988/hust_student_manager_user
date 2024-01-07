@@ -5,7 +5,7 @@ import { eq, lt, gte, ne, sql } from "drizzle-orm";
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   const session = getCookie(event, "session");
-  console.log(session);
+
   await db.execute(sql.raw(`CALL set_user_id_and_role('${session}');`));
   body.query = "%" + body.query + "%";
   console.log(body.query);

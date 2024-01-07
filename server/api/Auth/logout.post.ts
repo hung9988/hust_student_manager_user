@@ -3,8 +3,7 @@ import { sql } from "drizzle-orm";
 import { db_user as db } from "../../../drizzle/db";
 
 export default defineEventHandler(async (event) => {
-  const cookie = parseCookies(event);
-  const session = event.headers.get("session");
+  const session = getCookie(event, "session");
 
   await db.transaction(async (db) => {
     await db.execute(

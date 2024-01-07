@@ -1,9 +1,10 @@
+import { parse } from "vue/compiler-sfc";
 import { db_user as db } from "../../drizzle/db";
 
 import { eq, lt, gte, ne, sql } from "drizzle-orm";
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
-  const session = event.headers.get("session");
+  const session = getCookie(event, "session");
   await db.execute(sql.raw(`CALL set_user_id_and_role('${session}');`));
   body.query = "'%" + body.query + "%'";
   console.log(body.query);
@@ -12,8 +13,11 @@ export default defineEventHandler(async (event) => {
       `
         select cf.*,t.last_name,t.first_name from classes_full cf join users t on cf.teacher_id=t.user_id
       where
-        subject_id ILIKE ${body.query}
-        OR class_id :: varchar ILIKE ${body.query} OFFSET ${
+        is_open = true AND (subject_id IN (select subject_id from subjects_programs where program_id IN (select program_id from students where student_id=${
+          body.user_id
+        })) AND
+        (subject_id ILIKE ${body.query}
+        OR class_id::varchar ILIKE ${body.query})) OFFSET ${
           (body.page - 1) * body.pageCount
         }
       LIMIT
@@ -25,6 +29,9 @@ export default defineEventHandler(async (event) => {
     element.enrolled = element.enrolled_count + "/" + element.capacity;
   });
   // WORK IN PROGRESS
-
-  return { classes };
+  const totalrows = await db.execute(
+    sql.raw(`select count(*) from classes_full where
+  is_open = true AND (subject_id IN (select subject_id from subjects_programs where program_id IN (select program_id from students where student_id=${body.user_id})));`),
+  );
+  return { classes, totalrows };
 });

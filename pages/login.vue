@@ -71,7 +71,7 @@ const state = ref({
 
 const session = useCookie("session");
 const role = useCookie("role");
-
+const user_id = useCookie("user_id");
 async function submit(event: FormSubmitEvent<Schema>) {
   pending.value = true;
   const res = await useFetch("/api/Auth/login", {
@@ -87,6 +87,7 @@ async function submit(event: FormSubmitEvent<Schema>) {
       localStorage.setItem("user", JSON.stringify(res.data.value.user_info));
       session.value = res.data.value.session;
       role.value = res.data.value.user_info.basic_info.role;
+      user_id.value = res.data.value.user_info.basic_info.user_id;
     }
 
     if (res.data.value.user_info.basic_info.role === "Student") {

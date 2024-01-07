@@ -4,7 +4,7 @@ import { sql } from "drizzle-orm";
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event);
-    const session = event.headers.get("session");
+    const session = getCookie(event, "session");
     await db.execute(sql.raw(`CALL set_user_id_and_role('${session}');`));
     let all_scholarship = "";
     for (const element of body.data) {
